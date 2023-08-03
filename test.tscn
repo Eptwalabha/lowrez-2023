@@ -1,0 +1,36 @@
+[gd_scene load_steps=4 format=3 uid="uid://80fxfpbxv0kx"]
+
+[ext_resource type="Script" path="res://test.gd" id="1_j5sv1"]
+[ext_resource type="Texture2D" uid="uid://gtcwniq51n1v" path="res://icon.svg" id="1_x3yky"]
+[ext_resource type="PackedScene" uid="uid://3tl6cslj3pk4" path="res://scenes/dialog/dialog-box.tscn" id="3_jgakn"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_j5sv1")
+
+[node name="Icon" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_x3yky")
+centered = false
+
+[node name="Camera2D" type="Camera2D" parent="."]
+offset = Vector2(32, 32)
+
+[node name="DialogBox" parent="." instance=ExtResource("3_jgakn")]
+text = "abcdefghijklmnopqrstuvwxyz 0123456789"
+typer_speed = 2
+
+[node name="Label" type="Label" parent="DialogBox"]
+anchors_preset = -1
+anchor_left = 1.353
+anchor_top = 0.197
+anchor_right = 1.353
+anchor_bottom = 0.197
+offset_left = -15.592
+offset_top = -6.608
+offset_right = 140.408
+offset_bottom = 80.392
+text = " !\"#$%&'()*+,-./0123456789:;<=>?@
+ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`
+abcdefghijklmnopqrstuvwxyz{|}~
+àáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ
+"

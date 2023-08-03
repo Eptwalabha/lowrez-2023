@@ -1,0 +1,40 @@
+[gd_scene load_steps=3 format=3 uid="uid://3tl6cslj3pk4"]
+
+[ext_resource type="Script" path="res://scenes/dialog/dialog-box.gd" id="1_msd3r"]
+[ext_resource type="AudioStream" uid="uid://drnp58jkjby5n" path="res://assets/sound/typewriter.wav" id="2_gijpj"]
+
+[node name="DialogBox" type="CanvasLayer"]
+script = ExtResource("1_msd3r")
+
+[node name="TextureRect" type="ColorRect" parent="."]
+offset_top = 39.0
+offset_right = 64.0
+offset_bottom = 64.0
+color = Color(0, 0, 0, 1)
+
+[node name="Margin" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 39.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_top = 2
+theme_override_constants/margin_right = 2
+theme_override_constants/margin_bottom = 2
+
+[node name="Dialog" type="RichTextLabel" parent="Margin"]
+layout_mode = 2
+bbcode_enabled = true
+visible_characters = 2
+visible_characters_behavior = 1
+
+[node name="TyperSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_gijpj")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.02
+one_shot = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

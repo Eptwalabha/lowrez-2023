@@ -1,0 +1,6 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://3j008odjr7ku"]
+
+[ext_resource type="FontVariation" uid="uid://u6ox1bpr2qi5" path="res://assets/font/lowrez-font.tres" id="1_psmnt"]
+
+[resource]
+default_font = ExtResource("1_psmnt")

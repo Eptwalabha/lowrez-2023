@@ -1,0 +1,33 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="lowrez-2023"
+config/tags=PackedStringArray("itch_jam", "lowrez")
+run/main_scene="res://test.tscn"
+config/features=PackedStringArray("4.1", "Forward Plus")
+config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=64
+window/size/viewport_height=64
+window/size/window_width_override=600
+window/size/window_height_override=600
+window/stretch/mode="viewport"
+
+[gui]
+
+theme/custom="res://assets/theme/lowrez-theme.tres"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
