@@ -5,10 +5,10 @@ extends Node3D
 @onready var cloth: Node3D = $cloth
 @onready var particles: CPUParticles3D = $CPUParticles3D
 
-const SPEED : float = 40.0
+const SPEED : float = 20.0
 const ROTATION_SPEED : float = 3.0
 const MOVEMENT_SPEED : float = 5.0
-const RESET_CLOTH_POSITION : float = -30.0
+const RESET_CLOTH_POSITION : float = 30.0
 const CELL_SIZE : float = 3.0
 
 var player_pos : Vector2i = Vector2(0, 1)
