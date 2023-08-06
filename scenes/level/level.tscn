@@ -1,0 +1,93 @@
+[gd_scene load_steps=11 format=3 uid="uid://bn6d87vfhoe7"]
+
+[ext_resource type="Script" path="res://scenes/level/level.gd" id="1_ohibj"]
+[ext_resource type="PackedScene" uid="uid://bbyguj7bs5o30" path="res://scenes/player/player.tscn" id="2_84tfw"]
+[ext_resource type="PackedScene" uid="uid://vapmd7pyryh" path="res://scenes/level/segment.tscn" id="2_immln"]
+[ext_resource type="PackedScene" uid="uid://6cvl00uldil5" path="res://scenes/level/cloth.tscn" id="2_jshvr"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_mox8k"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_bottom_color = Color(0.309804, 0.309804, 0.309804, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_kc165"]
+sky_material = SubResource("ProceduralSkyMaterial_mox8k")
+
+[sub_resource type="Environment" id="Environment_sl8p4"]
+background_mode = 2
+sky = SubResource("Sky_kc165")
+tonemap_mode = 2
+ssao_enabled = true
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mfrcu"]
+shading_mode = 0
+vertex_color_use_as_albedo = true
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_m5unn"]
+material = SubResource("StandardMaterial3D_mfrcu")
+size = Vector2(0.5, 0.5)
+
+[sub_resource type="Curve" id="Curve_715a4"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.189474), -1.67393, 0.0, 0, 0]
+point_count = 2
+
+[node name="Level" type="Node3D"]
+script = ExtResource("1_ohibj")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_sl8p4")
+
+[node name="Pivot" type="Node3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="player" parent="Pivot" instance=ExtResource("2_84tfw")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.5)
+
+[node name="Camera3D" type="Camera3D" parent="Pivot"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 5, 0)
+fov = 90.0
+
+[node name="cloth" parent="." instance=ExtResource("2_jshvr")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -150, 2)
+
+[node name="Segments" type="Node3D" parent="."]
+
+[node name="segment" parent="Segments" instance=ExtResource("2_immln")]
+
+[node name="Segment2" parent="Segments" instance=ExtResource("2_immln")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -30, 0)
+
+[node name="Segment3" parent="Segments" instance=ExtResource("2_immln")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -60, 0)
+
+[node name="Segment4" parent="Segments" instance=ExtResource("2_immln")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -90, 0)
+
+[node name="CPUParticles3D" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.524169, 0)
+emitting = false
+amount = 32
+lifetime = 0.5
+one_shot = true
+explosiveness = 0.9
+randomness = 0.7
+mesh = SubResource("PlaneMesh_m5unn")
+emission_shape = 1
+emission_sphere_radius = 1.0
+direction = Vector3(0, 1, 0)
+spread = 75.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 10.0
+initial_velocity_max = 15.0
+angular_velocity_min = -90.0
+angular_velocity_max = 90.0
+angle_min = -180.0
+angle_max = 180.0
+scale_amount_curve = SubResource("Curve_715a4")
+color = Color(0.243137, 0.552941, 0.843137, 1)
+hue_variation_min = -1.0
+hue_variation_max = 1.0
+
+[connection signal="cloth_caugth" from="Pivot/player" to="." method="_on_player_cloth_caugth"]
+[connection signal="behind_camera" from="cloth" to="." method="_on_cloth_behind_camera"]

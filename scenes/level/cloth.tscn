@@ -1,0 +1,31 @@
+[gd_scene load_steps=6 format=3 uid="uid://6cvl00uldil5"]
+
+[ext_resource type="Texture2D" uid="uid://gtcwniq51n1v" path="res://icon.svg" id="1_h8bss"]
+[ext_resource type="Script" path="res://scenes/level/cloth.gd" id="1_smusf"]
+[ext_resource type="Texture2D" uid="uid://b8w085g24egke" path="res://assets/img/white.png" id="2_vgsfk"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6ucnc"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7wbxc"]
+albedo_color = Color(0.180392, 0.592157, 0.905882, 1)
+albedo_texture = ExtResource("2_vgsfk")
+distance_fade_mode = 2
+distance_fade_min_distance = 160.0
+distance_fade_max_distance = 150.0
+
+[node name="Cloth" type="Node3D"]
+script = ExtResource("1_smusf")
+
+[node name="Area3D" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
+shape = SubResource("BoxShape3D_6ucnc")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.536781, 0)
+material_override = SubResource("StandardMaterial3D_7wbxc")
+modulate = Color(0, 0.568627, 0.85098, 1)
+axis = 1
+transparent = false
+shaded = true
+texture = ExtResource("1_h8bss")
