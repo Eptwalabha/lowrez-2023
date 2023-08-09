@@ -68,11 +68,11 @@ environment = SubResource("Environment_sl8p4")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)
 
 [node name="wall1" type="CSGMesh3D" parent="building"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -4.5, -100, 0)
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -4.5, -80, 0)
 mesh = SubResource("QuadMesh_nnqih")
 
 [node name="wall2" type="CSGMesh3D" parent="building"]
-transform = Transform3D(1.31134e-07, 0, -1, 0, 1, 0, 1, 0, 1.31134e-07, 4.5, -100, 0)
+transform = Transform3D(1.31134e-07, 0, -1, 0, 1, 0, 1, 0, 1.31134e-07, 4.5, -80, 0)
 mesh = SubResource("QuadMesh_nnqih")
 
 [node name="blocks" type="Node3D" parent="building"]
@@ -83,12 +83,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -156, 2)
 [node name="Pivot" type="Node3D" parent="."]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
 
-[node name="player" parent="Pivot" instance=ExtResource("2_84tfw")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.5)
-
-[node name="Camera3D" type="Camera3D" parent="Pivot"]
+[node name="camera" type="Camera3D" parent="Pivot"]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 6, 0)
 fov = 90.0
+
+[node name="player" parent="Pivot" instance=ExtResource("2_84tfw")]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.5)
 
 [node name="CPUParticles3D" type="CPUParticles3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.524169, 0)

@@ -1,10 +1,11 @@
 extends Node3D
 
 @onready var pivot: Node3D = $Pivot
-@onready var player: Node3D = $Pivot/player
+@onready var player: Node3D = %player
 @onready var cloth: Node3D = $building/cloth
 @onready var particles: CPUParticles3D = $CPUParticles3D
 @onready var blocks: Node3D = $building/blocks
+@onready var camera_3d: Camera3D = %camera
 
 var BLOCK = preload("res://scenes/level/block/block_item.tscn")
 
@@ -12,6 +13,9 @@ const SPEED : float = 20.0
 const ROTATION_SPEED : float = 3.0
 const MOVEMENT_SPEED : float = 5.0
 const RESET_CLOTH_POSITION : float = 30.0
+const GRID_SIZE : int = 2
+const GRID_WIDTH : int = GRID_SIZE * 2 + 1
+const LOWEST_LEVEL : int = 10
 
 var player_pos : Vector2i = Vector2(0, 1)
 var player_dir : Vector2i = Vector2(0, -1)
@@ -19,6 +23,7 @@ var can_move : bool = true
 var next_move : Vector2i = Vector2i.ZERO
 
 var level : int = 0
+var cube : Dictionary = {}
 
 func _ready() -> void:
 	player.position = Vector3(player_pos.x, 0, player_pos.y) * GameData.cell_size
@@ -26,6 +31,13 @@ func _ready() -> void:
 	reset_level()
 
 func reset_level() -> void:
+	var x : float = GameData.cell_size * (GRID_SIZE + .5)
+	$building/wall1.position.x = -x - .5
+	$building/wall2.position.x = x + .5
+	camera_3d.position.y = (x + .5) / sin(PI / 2.0)
+	cube = {}
+	for i in range(LOWEST_LEVEL):
+		cube[i] = []
 	level = 0
 
 func _input(event: InputEvent) -> void:
@@ -46,10 +58,15 @@ func move_level_up() -> void:
 		if block is BlockItem:
 			block.tick(level)
 
+	cube[level - 1] = []
 	for i in range(randi() % 3):
 		var b = BLOCK.instantiate()
 		blocks.add_child(b)
-		b.position = random_cell_position(-10 * GameData.cell_size)
+		b.set_color(level)
+		var p = random_cell_position(-LOWEST_LEVEL * GameData.cell_size)
+		b.position = p
+		cube[level - 1].push_back(p)
+
 	tween.tween_property(material, "uv1_offset:y", -level * 0.25 - .1, GameData.TICK_COOLDOWN)
 
 func move_player(x: int, y: int) -> void:
@@ -59,11 +76,17 @@ func move_player(x: int, y: int) -> void:
 	do_move(x, y)
 
 func zone_clamp(vector: Vector2i) -> Vector2i:
-	return vector.clamp(Vector2i(-1, -1), Vector2i(1, 1))
+	return vector.clamp(Vector2i.ONE * -GRID_SIZE, Vector2i.ONE * GRID_SIZE)
+
+func new_position_allowed(pos: Vector2i) -> bool:
+	var key : int = level - LOWEST_LEVEL + 1
+	if cube.has(key):
+		print(cube[key])
+	return true
 
 func do_move(x: int, y: int) -> void:
 	var new_player_pos : Vector2i = zone_clamp(player_pos + Vector2i(x, y))
-	if new_player_pos != player_pos:
+	if new_player_pos != player_pos and new_position_allowed(new_player_pos):
 		level += 1
 		move_level_up()
 		can_move = false
@@ -71,16 +94,30 @@ func do_move(x: int, y: int) -> void:
 		var tween : Tween = create_tween()
 		tween.tween_property(player, "rotation:y", direction(x, y), GameData.TICK_COOLDOWN / 2.0)
 		player_dir = Vector2i(x, y)
-		tween.parallel().tween_property(player, "position", cell_position(player_pos), GameData.TICK_COOLDOWN)
+		var pp1 = cell_position(player_pos)
+		var pp2 = pp1
+		pp2.y = camera_3d.position.y
+		tween.parallel().tween_property(player, "position", pp1, GameData.TICK_COOLDOWN)
+		tween.parallel().tween_property(camera_3d, "position", pp2, GameData.TICK_COOLDOWN)
 		tween.finished.connect(_player_move_over, CONNECT_ONE_SHOT)
 
-func random_cell_position(height: float) -> Vector3:
-	var p : Vector3 = cell_position(Vector2i(randi() % 3 - 1, randi() % 3 - 1))
-	p.y = height
-	return p
+func cell_id_to_vector2(id: int) -> Vector2i:
+	return Vector2i(id % GRID_WIDTH, id / GRID_WIDTH)
+
+func cell_pos_to_id(pos: Vector2i) -> int:
+	return pos.x + pos.y * GRID_WIDTH
 
 func cell_position(pos: Vector2i) -> Vector3:
 	return Vector3(pos.x * GameData.cell_size, 0.0, pos.y * GameData.cell_size)
+
+func random_cell_id() -> int:
+	return randi() % (GRID_WIDTH * GRID_WIDTH)
+
+func random_cell_position(height: float) -> Vector3:
+	var l : Array = range(-GRID_SIZE, GRID_SIZE + 1)
+	var p : Vector3 = cell_position(Vector2i(l.pick_random(), l.pick_random()))
+	p.y = height
+	return p
 
 func direction(x: int, y: int) -> float:
 	return player.rotation.y + Vector2(x, y).angle_to(player_dir)
