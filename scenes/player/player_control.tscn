@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://c2h0m8380geyo"]
+
+[ext_resource type="Texture2D" uid="uid://dko2s8arquha2" path="res://assets/img/arrow.png" id="1_ui03j"]
+[ext_resource type="Script" path="res://scenes/player/player_control.gd" id="1_x1f8j"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qbwof"]
+transparency = 1
+shading_mode = 0
+albedo_texture = ExtResource("1_ui03j")
+texture_filter = 0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_pw2wq"]
+material = SubResource("StandardMaterial3D_qbwof")
+size = Vector2(1, 1)
+
+[node name="PlayerControl" type="Node3D"]
+script = ExtResource("1_x1f8j")
+
+[node name="Top" type="CSGMesh3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.5)
+mesh = SubResource("PlaneMesh_pw2wq")
+
+[node name="Right" type="CSGMesh3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 1.5, 0, 0)
+mesh = SubResource("PlaneMesh_pw2wq")
+
+[node name="Bottom" type="CSGMesh3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 1.5)
+mesh = SubResource("PlaneMesh_pw2wq")
+
+[node name="Left" type="CSGMesh3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -1.5, 0, 0)
+mesh = SubResource("PlaneMesh_pw2wq")

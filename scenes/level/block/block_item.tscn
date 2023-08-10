@@ -8,7 +8,7 @@ resource_local_to_scene = true
 [sub_resource type="BoxMesh" id="BoxMesh_vr0to"]
 resource_local_to_scene = true
 material = SubResource("StandardMaterial3D_jhq5o")
-size = Vector3(3, 3, 3)
+size = Vector3(2, 2, 2)
 
 [node name="BlockItem" type="Node3D"]
 script = ExtResource("1_4u235")

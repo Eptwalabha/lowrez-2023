@@ -12,7 +12,7 @@ script = ExtResource("1_s40t3")
 [node name="Pivot" type="Node3D" parent="."]
 
 [node name="Sprite" type="Sprite3D" parent="Pivot"]
-transform = Transform3D(-2.5, -3.77489e-07, 1.65006e-14, 0, -1.09278e-07, -2.5, 3.77489e-07, -2.5, 1.09278e-07, 0, 0, 0)
+transform = Transform3D(-1, -1.50996e-07, 6.60024e-15, 0, -4.37114e-08, -1, 1.50996e-07, -1, 4.37114e-08, 0, 0, 0)
 texture_filter = 0
 texture = ExtResource("2_4vogg")
 

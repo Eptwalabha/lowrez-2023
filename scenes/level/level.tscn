@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bn6d87vfhoe7"]
+[gd_scene load_steps=16 format=3 uid="uid://bn6d87vfhoe7"]
 
 [ext_resource type="Script" path="res://scenes/level/level.gd" id="1_ohibj"]
 [ext_resource type="PackedScene" uid="uid://bbyguj7bs5o30" path="res://scenes/player/player.tscn" id="2_84tfw"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://6cvl00uldil5" path="res://scenes/level/cloth.tscn" id="2_jshvr"]
 [ext_resource type="Texture2D" uid="uid://c3rbplis44ko2" path="res://assets/img/window-emissive.png" id="3_8nbvb"]
 [ext_resource type="Texture2D" uid="uid://bmdl5skmrf5df" path="res://assets/img/window-roughness.png" id="3_skbbc"]
+[ext_resource type="PackedScene" uid="uid://c2h0m8380geyo" path="res://scenes/player/player_control.tscn" id="7_5bp68"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_mox8k"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -82,14 +83,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -156, 2)
 
 [node name="Pivot" type="Node3D" parent="."]
 
-[node name="camera" type="Camera3D" parent="Pivot"]
-unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 6, 0)
-fov = 70.0
-far = 300.0
-
 [node name="player" parent="Pivot" instance=ExtResource("2_84tfw")]
 unique_name_in_owner = true
+
+[node name="PlayerControl" parent="Pivot" instance=ExtResource("7_5bp68")]
+
+[node name="CameraPivot" type="Node3D" parent="Pivot"]
+
+[node name="camera" type="Camera3D" parent="Pivot/CameraPivot"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 3.61, 0)
+fov = 70.0
+far = 300.0
 
 [node name="CPUParticles3D" type="CPUParticles3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.524169, 0)

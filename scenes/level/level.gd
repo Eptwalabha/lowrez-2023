@@ -2,10 +2,13 @@ extends Node3D
 
 @onready var pivot: Node3D = $Pivot
 @onready var player: Node3D = %player
+@onready var player_control: Node3D = $Pivot/PlayerControl
 @onready var cloth: Node3D = $building/cloth
 @onready var particles: CPUParticles3D = $CPUParticles3D
 @onready var blocks: Node3D = $building/blocks
-@onready var camera_3d: Camera3D = %camera
+
+@onready var camera_3d: Node3D = $Pivot/CameraPivot
+@onready var camera: Camera3D = %camera
 
 var BLOCK = preload("res://scenes/level/block/block_item.tscn")
 
@@ -36,11 +39,11 @@ func reset_level() -> void:
 	var id = random_cell_id()
 	player_pos = cell_id_to_vector2(id)
 	player.position = cell_position(player_pos)
+	player_control.position = player.position
 	camera_3d.position = player.position
-	camera_3d.position.y = (x + .5) / (2 * sin(PI / 2.0))
+#	camera_3d.position.y = 6.0
 	cube = {}
-	for i in range(LOWEST_LEVEL):
-		cube[i] = []
+	generate_bottom_level()
 	level = 0
 
 func _input(event: InputEvent) -> void:
@@ -53,13 +56,7 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("move-right"):
 		move_player(1, 0)
 
-func move_level_up() -> void:
-	var material : Material = $building/wall1.mesh.material
-	var tween : Tween = create_tween()
-	for block in blocks.get_children():
-		if block is BlockItem:
-			block.tick(level)
-
+func generate_bottom_level() -> void:
 	cube[level] = []
 	for i in range(randi() % 3 + 1):
 		var b = BLOCK.instantiate()
@@ -67,10 +64,16 @@ func move_level_up() -> void:
 		b.set_color(level)
 		var p2 = cell_id_to_vector2(random_cell_id())
 		var p3 = cell_position(p2)
-		p3.y = -(LOWEST_LEVEL - 1) * GameData.cell_size
+		p3.y = -LOWEST_LEVEL * GameData.cell_size
 		b.position = p3
 		cube[level].push_back(p2)
 
+func move_level_up() -> void:
+	var material : Material = $building/wall1.mesh.material
+	var tween : Tween = create_tween()
+	for block in blocks.get_children():
+		if block is BlockItem:
+			block.tick(level)
 	tween.tween_property(material, "uv1_offset:y", -level * 0.125 - .1, GameData.TICK_COOLDOWN)
 
 func move_player(x: int, y: int) -> void:
@@ -85,6 +88,7 @@ func zone_clamp(vector: Vector2i) -> Vector2i:
 func new_position_allowed(pos: Vector2i) -> bool:
 	var key : int = level - LOWEST_LEVEL + 1
 	if cube.has(key):
+		print(key, cube[key])
 		for i in cube[key]:
 			if i == pos:
 				return false
@@ -94,7 +98,9 @@ func do_move(x: int, y: int) -> void:
 	var new_player_pos : Vector2i = zone_clamp(player_pos + Vector2i(x, y))
 	if new_player_pos != player_pos and new_position_allowed(new_player_pos):
 		level += 1
+		generate_bottom_level()
 		move_level_up()
+		update_control()
 		can_move = false
 		player_pos = new_player_pos
 		var tween : Tween = create_tween()
@@ -104,6 +110,7 @@ func do_move(x: int, y: int) -> void:
 		var pp2 = pp1
 		pp2.y = camera_3d.position.y
 		tween.parallel().tween_property(player, "position", pp1, GameData.TICK_COOLDOWN)
+		tween.parallel().tween_property(player_control, "position", pp1, GameData.TICK_COOLDOWN)
 		tween.parallel().tween_property(camera_3d, "position", pp2, GameData.TICK_COOLDOWN)
 		tween.finished.connect(_player_move_over, CONNECT_ONE_SHOT)
 
@@ -121,7 +128,6 @@ func random_cell_id() -> int:
 
 func random_cell_position(height: float) -> Vector3:
 	var l : Array = range(0, GRID_WIDTH)
-	print(l)
 	var p : Vector3 = cell_position(Vector2i(l.pick_random(), l.pick_random()))
 	p.y = height
 	return p
@@ -145,3 +151,6 @@ func _player_move_over() -> void:
 	if next_move != Vector2i.ZERO:
 		do_move(next_move.x, next_move.y)
 		next_move = Vector2i.ZERO
+
+func update_control() -> void:
+	pass
