@@ -88,7 +88,6 @@ func zone_clamp(vector: Vector2i) -> Vector2i:
 func new_position_allowed(pos: Vector2i) -> bool:
 	var key : int = level - LOWEST_LEVEL + 1
 	if cube.has(key):
-		print(key, cube[key])
 		for i in cube[key]:
 			if i == pos:
 				return false
@@ -100,9 +99,9 @@ func do_move(x: int, y: int) -> void:
 		level += 1
 		generate_bottom_level()
 		move_level_up()
-		update_control()
 		can_move = false
 		player_pos = new_player_pos
+		update_control()
 		var tween : Tween = create_tween()
 		tween.tween_property(player, "rotation:y", direction(x, y), GameData.TICK_COOLDOWN / 2.0)
 		player_dir = Vector2i(x, y)
@@ -153,4 +152,16 @@ func _player_move_over() -> void:
 		next_move = Vector2i.ZERO
 
 func update_control() -> void:
-	pass
+	var key : int = level - LOWEST_LEVEL + 1
+	if cube.has(key):
+		var cubes = cube[key]
+		player_control.top.visible = not cubes.has(player_pos + Vector2i.UP)
+		player_control.right.visible = not cubes.has(player_pos + Vector2i.RIGHT)
+		player_control.bottom.visible = not cubes.has(player_pos + Vector2i.DOWN)
+		player_control.left.visible = not cubes.has(player_pos + Vector2i.LEFT)
+	else:
+		player_control.top.visible = true
+		player_control.right.visible = true
+		player_control.bottom.visible = true
+		player_control.left.visible = true
+
