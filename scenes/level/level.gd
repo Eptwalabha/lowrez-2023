@@ -30,6 +30,7 @@ var cube : Dictionary = {}
 func _ready() -> void:
 	player.position = Vector3(player_pos.x, 0, player_pos.y) * GameData.cell_size
 	cloth.position.y = RESET_CLOTH_POSITION
+	GameOver.restart_requested.connect(_on_restart_clicked)
 	reset_level()
 
 func reset_level() -> void:
@@ -43,8 +44,14 @@ func reset_level() -> void:
 	camera_3d.position = player.position
 #	camera_3d.position.y = 6.0
 	cube = {}
+	for b in blocks.get_children():
+		b.queue_free()
+	can_move = true
+	player_control.visible = true
 	generate_bottom_level()
 	level = 0
+	GameOver.overlay_hide()
+	$building/wall1.mesh.material.uv1_offset.y = -level * 0.125 - .1
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("move-down"):
@@ -99,30 +106,30 @@ func do_move(x: int, y: int) -> void:
 		do_move_player(new_player_pos)
 
 func do_move_player(new_player_pos) -> void:
-		level += 1
-		generate_bottom_level()
-		move_level_up()
-		can_move = false
-		var angle = angle_from_direction(new_player_pos - player_pos)
-		player_dir = new_player_pos - player_pos
-		player_pos = new_player_pos
-		var allowed_directions = get_allowed_directions()
-		update_control(allowed_directions)
-		var tween : Tween = create_tween()
-		tween.tween_property(player, "rotation:y", angle, GameData.TICK_COOLDOWN / 2.0)
-		var pp1 = cell_position(player_pos)
-		var pp2 = pp1
-		pp2.y = camera_3d.position.y
-		tween.parallel().tween_property(player, "position", pp1, GameData.TICK_COOLDOWN)
-		tween.parallel().tween_property(player_control, "position", pp1, GameData.TICK_COOLDOWN)
-		tween.parallel().tween_property(camera_3d, "position", pp2, GameData.TICK_COOLDOWN)
-		if not new_position_allowed(player_pos):
-			player_control.visible = false
-			tween.finished.connect(_game_over, CONNECT_ONE_SHOT)
-		elif allowed_directions.size() == 0:
-			tween.finished.connect(do_move_player.bind(player_pos), CONNECT_ONE_SHOT)
-		else:
-			tween.finished.connect(_player_move_over, CONNECT_ONE_SHOT)
+	level += 1
+	generate_bottom_level()
+	move_level_up()
+	can_move = false
+	var angle = angle_from_direction(new_player_pos - player_pos)
+	player_dir = new_player_pos - player_pos
+	player_pos = new_player_pos
+	var allowed_directions = get_allowed_directions()
+	update_control(allowed_directions)
+	var tween : Tween = create_tween()
+	tween.tween_property(player, "rotation:y", angle, GameData.TICK_COOLDOWN / 2.0)
+	var pp1 = cell_position(player_pos)
+	var pp2 = pp1
+	pp2.y = camera_3d.position.y
+	tween.parallel().tween_property(player, "position", pp1, GameData.TICK_COOLDOWN)
+	tween.parallel().tween_property(player_control, "position", pp1, GameData.TICK_COOLDOWN)
+	tween.parallel().tween_property(camera_3d, "position", pp2, GameData.TICK_COOLDOWN)
+	if not new_position_allowed(player_pos):
+		player_control.visible = false
+		tween.finished.connect(_game_over, CONNECT_ONE_SHOT)
+	elif allowed_directions.size() == 0:
+		tween.finished.connect(do_move_player.bind(player_pos), CONNECT_ONE_SHOT)
+	else:
+		tween.finished.connect(_player_move_over, CONNECT_ONE_SHOT)
 
 func get_allowed_directions() -> Array[Vector2i]:
 	var key : int = level - LOWEST_LEVEL + 1
@@ -183,3 +190,6 @@ func update_control(allowed_directions: Array[Vector2i]) -> void:
 	player_control.right.visible = allowed_directions.has(Vector2i.RIGHT)
 	player_control.bottom.visible = allowed_directions.has(Vector2i.DOWN)
 	player_control.left.visible = allowed_directions.has(Vector2i.LEFT)
+
+func _on_restart_clicked() -> void:
+	reset_level()
