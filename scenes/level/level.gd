@@ -96,22 +96,45 @@ func new_position_allowed(pos: Vector2i) -> bool:
 func do_move(x: int, y: int) -> void:
 	var new_player_pos : Vector2i = zone_clamp(player_pos + Vector2i(x, y))
 	if new_player_pos != player_pos and new_position_allowed(new_player_pos):
+		do_move_player(new_player_pos)
+
+func do_move_player(new_player_pos) -> void:
 		level += 1
 		generate_bottom_level()
 		move_level_up()
 		can_move = false
+		var angle = angle_from_direction(new_player_pos - player_pos)
+		player_dir = new_player_pos - player_pos
 		player_pos = new_player_pos
-		update_control()
+		var allowed_directions = get_allowed_directions()
+		update_control(allowed_directions)
 		var tween : Tween = create_tween()
-		tween.tween_property(player, "rotation:y", direction(x, y), GameData.TICK_COOLDOWN / 2.0)
-		player_dir = Vector2i(x, y)
+		tween.tween_property(player, "rotation:y", angle, GameData.TICK_COOLDOWN / 2.0)
 		var pp1 = cell_position(player_pos)
 		var pp2 = pp1
 		pp2.y = camera_3d.position.y
 		tween.parallel().tween_property(player, "position", pp1, GameData.TICK_COOLDOWN)
 		tween.parallel().tween_property(player_control, "position", pp1, GameData.TICK_COOLDOWN)
 		tween.parallel().tween_property(camera_3d, "position", pp2, GameData.TICK_COOLDOWN)
-		tween.finished.connect(_player_move_over, CONNECT_ONE_SHOT)
+		if not new_position_allowed(player_pos):
+			player_control.visible = false
+			tween.finished.connect(_game_over, CONNECT_ONE_SHOT)
+		elif allowed_directions.size() == 0:
+			tween.finished.connect(do_move_player.bind(player_pos), CONNECT_ONE_SHOT)
+		else:
+			tween.finished.connect(_player_move_over, CONNECT_ONE_SHOT)
+
+func get_allowed_directions() -> Array[Vector2i]:
+	var key : int = level - LOWEST_LEVEL + 1
+	var allowed : Array[Vector2i] = [Vector2i.UP, Vector2i.RIGHT, Vector2i.DOWN, Vector2i.LEFT]
+	var cubes : Array = []
+	if cube.has(key):
+		cubes = cube[key]
+	return allowed.filter(func (dir: Vector2i) -> bool:
+		return not cubes.has(player_pos + dir) and within_bound(player_pos + dir) )
+
+func within_bound(cell_pos: Vector2i) -> bool:
+	return cell_pos.clamp(Vector2i.ZERO, Vector2i.ONE * (GRID_WIDTH - 1)) == cell_pos
 
 func cell_id_to_vector2(id: int) -> Vector2i:
 	return Vector2i(id % GRID_WIDTH, id / GRID_WIDTH)
@@ -131,8 +154,8 @@ func random_cell_position(height: float) -> Vector3:
 	p.y = height
 	return p
 
-func direction(x: int, y: int) -> float:
-	return player.rotation.y + Vector2(x, y).angle_to(player_dir)
+func angle_from_direction(new_player_dir: Vector2i) -> float:
+	return player.rotation.y + Vector2(new_player_dir).angle_to(player_dir)
 
 func _on_segment_reached_end_of_line(segment : Segment) -> void:
 	segment.position.y -= 120.0
@@ -151,17 +174,12 @@ func _player_move_over() -> void:
 		do_move(next_move.x, next_move.y)
 		next_move = Vector2i.ZERO
 
-func update_control() -> void:
-	var key : int = level - LOWEST_LEVEL + 1
-	if cube.has(key):
-		var cubes = cube[key]
-		player_control.top.visible = not cubes.has(player_pos + Vector2i.UP)
-		player_control.right.visible = not cubes.has(player_pos + Vector2i.RIGHT)
-		player_control.bottom.visible = not cubes.has(player_pos + Vector2i.DOWN)
-		player_control.left.visible = not cubes.has(player_pos + Vector2i.LEFT)
-	else:
-		player_control.top.visible = true
-		player_control.right.visible = true
-		player_control.bottom.visible = true
-		player_control.left.visible = true
+func _game_over() -> void:
+	print("game over")
+	GameOver.overlay_show()
 
+func update_control(allowed_directions: Array[Vector2i]) -> void:
+	player_control.top.visible = allowed_directions.has(Vector2i.UP)
+	player_control.right.visible = allowed_directions.has(Vector2i.RIGHT)
+	player_control.bottom.visible = allowed_directions.has(Vector2i.DOWN)
+	player_control.left.visible = allowed_directions.has(Vector2i.LEFT)
