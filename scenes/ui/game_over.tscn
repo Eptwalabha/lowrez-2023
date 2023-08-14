@@ -35,13 +35,13 @@ tracks/0/keys = {
 tracks/1/type = "bezier"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Control/VBoxContainer/Control:modulate:a")
+tracks/1/path = NodePath("Control/VBoxContainer/Banner:modulate:a")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"handle_modes": PackedInt32Array(0, 0),
-"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0),
-"times": PackedFloat32Array(0.2, 1)
+"handle_modes": PackedInt32Array(0, 0, 0),
+"points": PackedFloat32Array(0, -0.25, 0, 0.25, 0, 0, -0.25, 0, 0.25, 0, 1, -0.25, 0, 0.25, 0),
+"times": PackedFloat32Array(0, 0.2, 1)
 }
 tracks/2/type = "method"
 tracks/2/imported = false
@@ -69,6 +69,18 @@ tracks/3/keys = {
 "update": 1,
 "values": [false]
 }
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath(".:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_i502f"]
 _data = {
@@ -78,7 +90,6 @@ _data = {
 
 [node name="GameOverOverlay" type="CanvasLayer"]
 layer = 2
-visible = false
 script = ExtResource("1_6nplw")
 
 [node name="Control" type="Control" parent="."]
@@ -90,7 +101,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="ColorRect" type="ColorRect" parent="Control"]
+[node name="BlackBG" type="ColorRect" parent="Control"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -108,16 +119,16 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 0
 
-[node name="Control2" type="Control" parent="Control/VBoxContainer"]
+[node name="Spacer" type="Control" parent="Control/VBoxContainer"]
 custom_minimum_size = Vector2(0, 22)
 layout_mode = 2
 
-[node name="Control" type="Control" parent="Control/VBoxContainer"]
+[node name="Banner" type="Control" parent="Control/VBoxContainer"]
 modulate = Color(1, 1, 1, 0)
 custom_minimum_size = Vector2(0, 18)
 layout_mode = 2
 
-[node name="ColorRect2" type="ColorRect" parent="Control/VBoxContainer/Control"]
+[node name="ColorRect2" type="ColorRect" parent="Control/VBoxContainer/Banner"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -126,12 +137,12 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.364706, 0, 0, 1)
 
-[node name="Label" type="Label" parent="Control/VBoxContainer/Control"]
+[node name="Label" type="Label" parent="Control/VBoxContainer/Banner"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 4.0
+offset_top = 2.0
 grow_horizontal = 2
 grow_vertical = 2
 text = "YOU DIED"

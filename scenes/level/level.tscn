@@ -127,10 +127,10 @@ hue_variation_max = 1.0
 [node name="Label" type="Label" parent="CanvasLayer"]
 offset_left = 1.0
 offset_top = 1.0
-offset_right = 63.0
+offset_right = 64.0
 offset_bottom = 11.0
 theme_override_fonts/font = ExtResource("8_po5dj")
-text = "010"
+text = "0000"
 horizontal_alignment = 2
 
 [connection signal="behind_camera" from="building/cloth" to="." method="_on_cloth_behind_camera"]

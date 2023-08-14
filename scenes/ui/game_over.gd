@@ -8,14 +8,15 @@ signal restart_requested
 var can_click : bool = true
 
 func overlay_show() -> void:
-	
-	visible = true
 	can_click = false
 	anim.play("show")
 
 func overlay_hide() -> void:
 	visible = false
 	can_click = false
+	$Control/VBoxContainer/Banner.modulate.a = 0.0
+	$Control.modulate.a = 0.0
+	$Control/VBoxContainer/PlayAgain.visible = false
 	anim.stop()
 
 func _unhandled_input(event: InputEvent) -> void:
