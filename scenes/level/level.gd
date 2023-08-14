@@ -6,6 +6,7 @@ extends Node3D
 @onready var cloth: Node3D = $building/cloth
 @onready var particles: CPUParticles3D = $CPUParticles3D
 @onready var blocks: Node3D = $building/blocks
+@onready var score_label: Label = $CanvasLayer/Label
 
 @onready var camera_3d: Node3D = $Pivot/CameraPivot
 @onready var camera: Camera3D = %camera
@@ -23,6 +24,7 @@ var player_pos : Vector2i = Vector2(0, 1)
 var player_dir : Vector2i = Vector2(0, -1)
 var can_move : bool = true
 var next_move : Vector2i = Vector2i.ZERO
+var is_playing : bool = false
 
 var level : int = 0
 var cube : Dictionary = {}
@@ -42,7 +44,8 @@ func reset_level() -> void:
 	player.position = cell_position(player_pos)
 	player_control.position = player.position
 	camera_3d.position = player.position
-#	camera_3d.position.y = 6.0
+	player.rotation.y = 0.0
+	player_dir = Vector2i.UP
 	cube = {}
 	for b in blocks.get_children():
 		b.queue_free()
@@ -50,10 +53,19 @@ func reset_level() -> void:
 	player_control.visible = true
 	generate_bottom_level()
 	level = 0
+	is_playing = true
 	GameOver.overlay_hide()
+	update_score_label()
 	$building/wall1.mesh.material.uv1_offset.y = -level * 0.125 - .1
 
+func update_score_label() -> void:
+	score_label.text = str(level)
+
 func _input(event: InputEvent) -> void:
+	if not is_playing:
+		pass
+	if event.is_action_pressed("move-downward"):
+		do_move_player(player_pos)
 	if event.is_action_pressed("move-down"):
 		move_player(0, 1)
 	if event.is_action_pressed("move-up"):
@@ -107,6 +119,7 @@ func do_move(x: int, y: int) -> void:
 
 func do_move_player(new_player_pos) -> void:
 	level += 1
+	update_score_label()
 	generate_bottom_level()
 	move_level_up()
 	can_move = false
@@ -182,7 +195,7 @@ func _player_move_over() -> void:
 		next_move = Vector2i.ZERO
 
 func _game_over() -> void:
-	print("game over")
+	is_playing = false
 	GameOver.overlay_show()
 
 func update_control(allowed_directions: Array[Vector2i]) -> void:
@@ -193,3 +206,4 @@ func update_control(allowed_directions: Array[Vector2i]) -> void:
 
 func _on_restart_clicked() -> void:
 	reset_level()
+	get_tree().reload_current_scene()

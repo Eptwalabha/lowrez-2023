@@ -1,0 +1,7 @@
+[gd_resource type="FontVariation" load_steps=2 format=3 uid="uid://bfaol1ia2xnrt"]
+
+[ext_resource type="FontFile" uid="uid://dld7nvh7d7ltv" path="res://assets/font/lowrez-number.png" id="1_tc6bs"]
+
+[resource]
+base_font = ExtResource("1_tc6bs")
+spacing_glyph = -2

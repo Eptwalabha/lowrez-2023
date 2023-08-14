@@ -8,6 +8,7 @@ signal restart_requested
 var can_click : bool = true
 
 func overlay_show() -> void:
+	
 	visible = true
 	can_click = false
 	anim.play("show")
