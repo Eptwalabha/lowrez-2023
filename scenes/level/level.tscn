@@ -1,12 +1,10 @@
-[gd_scene load_steps=17 format=3 uid="uid://bn6d87vfhoe7"]
+[gd_scene load_steps=14 format=3 uid="uid://bn6d87vfhoe7"]
 
 [ext_resource type="Script" path="res://scenes/level/level.gd" id="1_ohibj"]
+[ext_resource type="PackedScene" uid="uid://64boaq1nlhto" path="res://scenes/level/sections/section.tscn" id="2_7nj6p"]
 [ext_resource type="PackedScene" uid="uid://bbyguj7bs5o30" path="res://scenes/player/player.tscn" id="2_84tfw"]
-[ext_resource type="Texture2D" uid="uid://bvjysjfnhxej3" path="res://assets/img/window.png" id="2_bbnf8"]
 [ext_resource type="PackedScene" uid="uid://6cvl00uldil5" path="res://scenes/level/cloth.tscn" id="2_jshvr"]
-[ext_resource type="Texture2D" uid="uid://c3rbplis44ko2" path="res://assets/img/window-emissive.png" id="3_8nbvb"]
-[ext_resource type="Texture2D" uid="uid://bmdl5skmrf5df" path="res://assets/img/window-roughness.png" id="3_skbbc"]
-[ext_resource type="PackedScene" uid="uid://c2h0m8380geyo" path="res://scenes/player/player_control.tscn" id="7_5bp68"]
+[ext_resource type="Material" uid="uid://brgv3o37um0jg" path="res://assets/material/windows.tres" id="3_rhpa0"]
 [ext_resource type="FontVariation" uid="uid://bfaol1ia2xnrt" path="res://assets/font/lowrez-number.tres" id="8_po5dj"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_mox8k"]
@@ -26,27 +24,8 @@ glow_enabled = true
 fog_enabled = true
 fog_light_color = Color(0.458824, 0.494118, 0.545098, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0syxx"]
-albedo_color = Color(1, 1, 1, 0.466667)
-albedo_texture = ExtResource("2_bbnf8")
-roughness = 0.29
-roughness_texture = ExtResource("3_skbbc")
-roughness_texture_channel = 3
-emission_enabled = true
-emission = Color(0.584314, 0.87451, 0.862745, 1)
-emission_energy_multiplier = 2.45
-emission_operator = 1
-emission_texture = ExtResource("3_8nbvb")
-refraction_texture = ExtResource("2_bbnf8")
-refraction_texture_channel = 4
-uv1_scale = Vector3(0.04, 0.04, 0.04)
-uv1_offset = Vector3(0.2, 0, 0)
-uv1_triplanar = true
-texture_filter = 2
-disable_receive_shadows = true
-
 [sub_resource type="QuadMesh" id="QuadMesh_nnqih"]
-material = SubResource("StandardMaterial3D_0syxx")
+material = ExtResource("3_rhpa0")
 size = Vector2(150, 200)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mfrcu"]
@@ -67,7 +46,23 @@ script = ExtResource("1_ohibj")
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_sl8p4")
 
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.2
+autostart = true
+
+[node name="sections" type="Node3D" parent="."]
+
+[node name="Section" parent="sections" instance=ExtResource("2_7nj6p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -20, 0)
+
+[node name="Section2" parent="sections" instance=ExtResource("2_7nj6p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -40, 0)
+
+[node name="Section3" parent="sections" instance=ExtResource("2_7nj6p")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -60, 0)
+
 [node name="building" type="Node3D" parent="."]
+visible = false
 
 [node name="wall1" type="CSGMesh3D" parent="building"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -80, 1.5)
@@ -86,8 +81,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -156, 2)
 
 [node name="player" parent="Pivot" instance=ExtResource("2_84tfw")]
 unique_name_in_owner = true
-
-[node name="PlayerControl" parent="Pivot" instance=ExtResource("7_5bp68")]
 
 [node name="CameraPivot" type="Node3D" parent="Pivot"]
 
@@ -133,5 +126,6 @@ theme_override_fonts/font = ExtResource("8_po5dj")
 text = "0000"
 horizontal_alignment = 2
 
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
 [connection signal="behind_camera" from="building/cloth" to="." method="_on_cloth_behind_camera"]
 [connection signal="cloth_caugth" from="Pivot/player" to="." method="_on_player_cloth_caugth"]

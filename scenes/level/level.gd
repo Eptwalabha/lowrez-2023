@@ -2,18 +2,19 @@ extends Node3D
 
 @onready var pivot: Node3D = $Pivot
 @onready var player: Node3D = %player
-@onready var player_control: Node3D = $Pivot/PlayerControl
 @onready var cloth: Node3D = $building/cloth
 @onready var particles: CPUParticles3D = $CPUParticles3D
 @onready var blocks: Node3D = $building/blocks
+@onready var sections: Node3D = $sections
 @onready var score_label: Label = $CanvasLayer/Label
+@onready var timer = $Timer
 
 @onready var camera_3d: Node3D = $Pivot/CameraPivot
 @onready var camera: Camera3D = %camera
 
 var BLOCK = preload("res://scenes/level/block/block_item.tscn")
 
-const SPEED : float = 20.0
+const SPEED : float = 10.0
 const ROTATION_SPEED : float = 3.0
 const MOVEMENT_SPEED : float = 5.0
 const RESET_CLOTH_POSITION : float = 30.0
@@ -42,7 +43,6 @@ func reset_level() -> void:
 	var id = random_cell_id()
 	player_pos = cell_id_to_vector2(id)
 	player.position = cell_position(player_pos)
-	player_control.position = player.position
 	camera_3d.position = player.position
 	player.rotation.y = 0.0
 	player_dir = Vector2i.UP
@@ -50,9 +50,8 @@ func reset_level() -> void:
 	for b in blocks.get_children():
 		b.queue_free()
 	can_move = true
-	player_control.visible = true
-	generate_bottom_level()
 	level = 0
+	generate_bottom_level()
 	is_playing = true
 	GameOver.overlay_hide()
 	update_score_label()
@@ -64,8 +63,6 @@ func update_score_label() -> void:
 func _input(event: InputEvent) -> void:
 	if not is_playing:
 		pass
-	if event.is_action_pressed("move-downward"):
-		do_move_player(player_pos)
 	if event.is_action_pressed("move-down"):
 		move_player(0, 1)
 	if event.is_action_pressed("move-up"):
@@ -76,24 +73,25 @@ func _input(event: InputEvent) -> void:
 		move_player(1, 0)
 
 func generate_bottom_level() -> void:
-	cube[level] = []
-	for i in range(randi() % 3 + 1):
-		var b = BLOCK.instantiate()
-		blocks.add_child(b)
-		b.set_color(level)
-		var p2 = cell_id_to_vector2(random_cell_id())
-		var p3 = cell_position(p2)
-		p3.y = -LOWEST_LEVEL * GameData.cell_size
-		b.position = p3
-		cube[level].push_back(p2)
+	pass
+
+func _physics_process(delta) -> void:
+	sections.position.y += delta * SPEED
+	_clean_up_sections()
 
 func move_level_up() -> void:
-	var material : Material = $building/wall1.mesh.material
-	var tween : Tween = create_tween()
-	for block in blocks.get_children():
-		if block is BlockItem:
-			block.tick(level)
-	tween.tween_property(material, "uv1_offset:y", -level * 0.125 - .1, GameData.TICK_COOLDOWN)
+	return
+#	level += 1
+#	update_score_label()
+#	var tween : Tween = create_tween()
+#	tween.tween_property(sections, "position:y", level * GameData.cell_size, 0.1)
+#	tween.finished.connect(_clean_up_sections)
+
+func _clean_up_sections() -> void:
+	for section in sections.get_children():
+		if section is Section:
+			if section.global_position.y > 5:
+				section.global_position.y -= 60.0
 
 func move_player(x: int, y: int) -> void:
 	if not can_move:
@@ -113,36 +111,26 @@ func new_position_allowed(pos: Vector2i) -> bool:
 	return true
 
 func do_move(x: int, y: int) -> void:
-	var new_player_pos : Vector2i = zone_clamp(player_pos + Vector2i(x, y))
-	if new_player_pos != player_pos and new_position_allowed(new_player_pos):
+	var direction = Vector2i(x, y)
+	var new_player_pos : Vector2i = player_pos + direction
+	if new_player_pos != player_pos and player.can_move(direction):
 		do_move_player(new_player_pos)
 
 func do_move_player(new_player_pos) -> void:
-	level += 1
-	update_score_label()
 	generate_bottom_level()
-	move_level_up()
 	can_move = false
-	var angle = angle_from_direction(new_player_pos - player_pos)
 	player_dir = new_player_pos - player_pos
 	player_pos = new_player_pos
-	var allowed_directions = get_allowed_directions()
-	update_control(allowed_directions)
 	var tween : Tween = create_tween()
-	tween.tween_property(player, "rotation:y", angle, GameData.TICK_COOLDOWN / 2.0)
+	player.face(player_dir)
 	var pp1 = cell_position(player_pos)
 	var pp2 = pp1
 	pp2.y = camera_3d.position.y
 	tween.parallel().tween_property(player, "position", pp1, GameData.TICK_COOLDOWN)
-	tween.parallel().tween_property(player_control, "position", pp1, GameData.TICK_COOLDOWN)
 	tween.parallel().tween_property(camera_3d, "position", pp2, GameData.TICK_COOLDOWN)
 	if not new_position_allowed(player_pos):
-		player_control.visible = false
 		tween.finished.connect(_game_over, CONNECT_ONE_SHOT)
-	elif allowed_directions.size() == 0:
-		tween.finished.connect(do_move_player.bind(player_pos), CONNECT_ONE_SHOT)
-	else:
-		tween.finished.connect(_player_move_over, CONNECT_ONE_SHOT)
+	tween.finished.connect(_player_move_over, CONNECT_ONE_SHOT)
 
 func get_allowed_directions() -> Array[Vector2i]:
 	var key : int = level - LOWEST_LEVEL + 1
@@ -174,9 +162,6 @@ func random_cell_position(height: float) -> Vector3:
 	p.y = height
 	return p
 
-func angle_from_direction(new_player_dir: Vector2i) -> float:
-	return player.rotation.y + Vector2(new_player_dir).angle_to(player_dir)
-
 func _on_segment_reached_end_of_line(segment : Segment) -> void:
 	segment.position.y -= 120.0
 
@@ -198,12 +183,9 @@ func _game_over() -> void:
 	is_playing = false
 	GameOver.overlay_show()
 
-func update_control(allowed_directions: Array[Vector2i]) -> void:
-	player_control.top.visible = allowed_directions.has(Vector2i.UP)
-	player_control.right.visible = allowed_directions.has(Vector2i.RIGHT)
-	player_control.bottom.visible = allowed_directions.has(Vector2i.DOWN)
-	player_control.left.visible = allowed_directions.has(Vector2i.LEFT)
-
 func _on_restart_clicked() -> void:
 	reset_level()
 	get_tree().reload_current_scene()
+
+func _on_timer_timeout():
+	move_level_up()

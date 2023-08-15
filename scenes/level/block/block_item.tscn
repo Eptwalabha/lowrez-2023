@@ -1,17 +1,23 @@
-[gd_scene load_steps=4 format=3 uid="uid://ufpy6w4mdfx8"]
+[gd_scene load_steps=5 format=3 uid="uid://ufpy6w4mdfx8"]
 
 [ext_resource type="Script" path="res://scenes/level/block/block_item.gd" id="1_4u235"]
+[ext_resource type="Material" uid="uid://brgv3o37um0jg" path="res://assets/material/windows.tres" id="1_800e6"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jhq5o"]
+[sub_resource type="BoxMesh" id="BoxMesh_0igk3"]
 resource_local_to_scene = true
-
-[sub_resource type="BoxMesh" id="BoxMesh_vr0to"]
-resource_local_to_scene = true
-material = SubResource("StandardMaterial3D_jhq5o")
+material = ExtResource("1_800e6")
 size = Vector3(2, 2, 2)
 
-[node name="BlockItem" type="Node3D"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_oxh80"]
+size = Vector3(1.6, 1.6, 1.6)
+
+[node name="BlockItem" type="Area3D"]
+collision_layer = 2
 script = ExtResource("1_4u235")
 
-[node name="CSGMesh3D" type="CSGMesh3D" parent="."]
-mesh = SubResource("BoxMesh_vr0to")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_0igk3")
+skeleton = NodePath("")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_oxh80")

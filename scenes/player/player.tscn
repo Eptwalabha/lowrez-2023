@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://d4f11kmw1n6ks" path="res://assets/img/player.png" id="2_4vogg"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_kdtlg"]
-size = Vector3(2, 1, 2)
+size = Vector3(0.5, 0.4, 1.5)
 
 [node name="player" type="Node3D"]
 script = ExtResource("1_s40t3")
@@ -16,10 +16,33 @@ transform = Transform3D(-1.4, -2.11394e-07, 9.24033e-15, 0, -6.11959e-08, -1.4, 
 texture_filter = 0
 texture = ExtResource("2_4vogg")
 
-[node name="Area3D" type="Area3D" parent="."]
+[node name="Area3D" type="Area3D" parent="Pivot"]
+collision_mask = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pivot/Area3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
 shape = SubResource("BoxShape3D_kdtlg")
 
-[connection signal="area_entered" from="Area3D" to="." method="_on_area_3d_area_entered"]
+[node name="Directions" type="Node3D" parent="."]
+
+[node name="RayUp" type="RayCast3D" parent="Directions"]
+target_position = Vector3(0, 0, -2)
+collision_mask = 2
+collide_with_areas = true
+
+[node name="RayRight" type="RayCast3D" parent="Directions"]
+target_position = Vector3(2, 0, 0)
+collision_mask = 2
+collide_with_areas = true
+
+[node name="RayDown" type="RayCast3D" parent="Directions"]
+target_position = Vector3(0, 0, 2)
+collision_mask = 2
+collide_with_areas = true
+
+[node name="RayLeft" type="RayCast3D" parent="Directions"]
+target_position = Vector3(-2, 0, 0)
+collision_mask = 2
+collide_with_areas = true
+
+[connection signal="area_entered" from="Pivot/Area3D" to="." method="_on_area_3d_area_entered"]

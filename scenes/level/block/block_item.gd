@@ -1,13 +1,7 @@
 class_name BlockItem
-extends Node3D
-
-@onready var csg_mesh_3d: CSGMesh3D = $CSGMesh3D
+extends Area3D
 
 var level : int = 0
-
-func set_color(level: int) -> void:
-	var h : float = float(level % 10) / 10.0
-	csg_mesh_3d.mesh.material.albedo_color = Color.from_hsv(h, 1, 1)
 
 func tick(new_level: int) -> void:
 	if new_level != level:
